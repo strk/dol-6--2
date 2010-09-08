@@ -447,6 +447,21 @@ function openlayers_behaviors($reset = FALSE) {
 }
 
 /**
+ * Get all style plugins.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $reset
+ *   Boolean whether to reset cache or not.
+ * @return
+ *   Array of style handler info.
+ */
+function openlayers_style_plugins($reset = FALSE) {
+  ctools_include('plugins');
+  return ctools_get_plugins('openlayers', 'style_plugin');
+}
+
+/**
  * Get all openlayers styles.
  *
  * @ingroup openlayers_api
@@ -901,6 +916,87 @@ class openlayers_layer_type {
   }
 
   function render(&$map) {}
+}
+
+/**
+ * Base class for style plugins
+ *
+ * We define base classes in the core module.
+ * All other parent classes can be autoloaded through ctools.
+ */
+class openlayers_style_plugin {
+  var $options;
+
+  /**
+   * Constructor
+   *
+   * Takes options sent in and adds them to the
+   * class.
+   *
+   * @param $options
+   *   Array of options.
+   */
+  function __construct($options = array()) {
+    $this->options = $options + $this->options_init();
+  }
+
+  /**
+   * Initial default options.
+   *
+   * @return
+   *   Array of default options.
+   */
+  function options_init() {
+    return array();
+  }
+
+  /**
+   * Options form.
+   *
+   * @param $defaults
+   *   Array of default values for the form.
+   * @return
+   *   Array of Drupal form elements.
+   */
+  function options_form($defaults = array()) {
+    return array();
+  }
+
+  /**
+   * Render the style.
+   *
+   * @param $style
+   *   The style passed in to be handled.
+   */
+  function render(&$style) {
+    // Render style.
+  }
+}
+
+/**
+ * Implementation of hook_ctools_plugin_directory
+ */
+function openlayers_ctools_plugin_directory($module, $plugin) {
+  // The format of plugin includes should be the
+  // following:
+  //   modulename_plugin_name.inc
+  //
+  // For example:
+  //  openlayers_style_plugin_name.inc
+  
+  // If this module needed to supply style plugins.
+  /*
+  if ($module == 'openlayers' && $plugin == 'style_plugin') {
+    return 'plugins/style_plugin';
+  }
+  */
+  
+  // This should change to the following when converted:
+  /*
+  if ($module == 'openlayers') {
+    return 'plugins/' . $plugin;
+  }
+  */
 }
 
 /**

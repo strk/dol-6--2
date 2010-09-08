@@ -68,9 +68,31 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
  */
 function _openlayers_styles_process($styles = array(), 
   $layer_styles = array(), &$map = array()) {
+  ctools_include('plugins');
 
   // Get styles info array
   $styles_info = openlayers_styles();
+  
+  // Process with handler if available.
+  $style_plugins = openlayers_style_plugins();
+  foreach ($styles_info as $i => $style) {
+    // Check for plugins.
+    if (isset($style->data['plugins']) && 
+      is_array($style->data['plugins'])) {
+      foreach ($style->data['plugins'] as $p => $options) {
+        // Ensure that the plugin exists
+        if (($style_plugins[$p])) {
+          $plugin_class = ctools_plugin_get_class($style_plugins[$p], 
+            'style_plugin');
+          if (isset($plugin_class)) {
+            $plugin = new $plugin_class;
+            // Render the plugin with the style.
+            $plugin->render($styles_info[$i]);
+          }
+        }
+      }
+    }
+  }
 
   // Go through styles
   $processed = array();

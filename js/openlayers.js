@@ -266,16 +266,48 @@ Drupal.openlayers = {
   },
   'getStyleMap': function(map, layername) {
     if (map.styles) {
+
       var stylesAdded = {};
+
       // Grab and map base styles.
       for (var style in map.styles) {
         stylesAdded[style] = new OpenLayers.Style(map.styles[style]);
       }
+
       // Implement layer-specific styles.
       if (map.layer_styles !== undefined && map.layer_styles[layername]) {
-        var style = map.layer_styles[layername];
-        stylesAdded['default'] = new OpenLayers.Style(map.styles[style]);
+
+        var style_name = map.layer_styles[layername]; 
+        var style = map.styles[style_name]; // TODO: skip if undefined
+        
+        // Build context object
+
+        var newContext = {}
+
+        // Define parameters from plugin, if available
+        var plugins = map.styles[style_name].plugins;
+        for (var plugin_name in style.plugins)
+        {
+              var plugin_options = style.plugins[plugin_name];
+              var plugin_context_class = Drupal.openlayers.style_plugin[plugin_name];
+              // TODO: check for existance of plugin_context_class here
+              var plugin_context = new plugin_context_class(plugin_options);
+
+              // Add plugin context functions to global context
+              for (var key in plugin_context) {
+                  var newkey = plugin_name + '_' + key;
+                  var val = plugin_context[key];
+                  if ( typeof val === 'function' ) {
+                      newContext[newkey] = OpenLayers.Function.bind(val, plugin_context); // plugin_method_scope);
+                  }
+              }
+        }
+      
+        // Put together style_name
+        stylesAdded['default'] = stylesAdded['select'] = new OpenLayers.Style(style, 
+            { context: newContext } );
       }
+      
       return new OpenLayers.StyleMap(stylesAdded);
     }
     // Default styles
@@ -306,3 +338,4 @@ Drupal.openlayers = {
 };
 
 Drupal.openlayers.layer = {};
+Drupal.openlayers.style_plugin = {};

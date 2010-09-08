@@ -30,6 +30,16 @@ function openlayers_test_menu() {
 }
 
 /**
+ * Implementation of hook_ctools_plugin_directory
+ */
+function openlayers_test_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'openlayers' && $plugin == 'style_plugin') {
+    return 'plugins/style_plugin';
+  }
+}
+  
+
+/**
  * Implementation of hook_ctools_plugin_api().
  */
 function openlayers_test_ctools_plugin_api($module, $api) {
@@ -37,6 +47,9 @@ function openlayers_test_ctools_plugin_api($module, $api) {
   if ($module == "openlayers") {
     switch ($api) {
       case 'openlayers_presets':
+        return array('version' => 1);
+        
+      case 'openlayers_styles':
         return array('version' => 1);
 
     }
@@ -50,6 +63,32 @@ function openlayers_test_views_api() {
   return array(
     'api' => 2,
   );
+}
+
+/**
+ * Implementation of hook_openlayers_styles()
+ */
+function openlayers_test_openlayers_styles() {
+  $styles = array();
+
+  $style = new stdClass();
+  $style->api_version = 1;
+  $style->name = 'test_context';
+  $style->title = t('Test: Context style');
+  $style->description = t('A style to test context styling.');
+  $style->data = array(
+    'pointRadius' => '6',
+    'fillColor' => '#77777',
+    'strokeColor' => '#222222',
+    'strokeWidth' => '2',
+    'strokeOpacity' => '0.8',
+    'plugins' => array(
+      'openlayers_test_test_plugin' => array(),
+    ),
+  );
+  $styles[$style->name] = $style;
+
+  return $styles;
 }
 
 /**

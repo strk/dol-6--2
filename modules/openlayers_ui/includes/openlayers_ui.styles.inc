@@ -213,6 +213,9 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
   $form['info'] = array(
     '#type' => 'fieldset',
     '#tree' => FALSE,
+    '#title' => t('Basic Information'),
+    '#description' => t('The basic information for the style, used to refer to and describe the style.'),
+    '#collapsible' => TRUE,
   );
   $form['info']['name'] = array(
     '#title' => t('Name'),
@@ -233,8 +236,16 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
   );
 
   // OpenLayers style properties
-  $form['data'] = array('#type' => 'fieldset', '#tree' => TRUE);
-
+  $form['data'] = array(
+    '#type' => 'fieldset', 
+    '#tree' => TRUE,
+    '#title' => t('Style Properties and Plugins'),
+    '#description' => t('Style properties are properties as 
+      defined by the OpenLayers library.  Plugins are dynamically
+      process the layer at render time; plugins may override the
+      values that you have set for style properies.'),
+    '#collapsible' => TRUE,
+  );
   foreach ($properties as $key => $prop) {
     $form['data'][$key] = array(
       '#type' => !isset($prop['options']) ? 'textfield' : 'select',
@@ -249,6 +260,10 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
       $form['data'][$key]['#options'] = $prop['options'];
     }
   }
+  
+  // Add style plugins
+  $form['data']['plugins'] = openlayers_ui_get_style_plugin_options(
+    isset($style->data) ? $style->data : array());
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -264,7 +279,7 @@ function openlayers_ui_styles_form_submit(&$form, &$form_state) {
   $style_data = $form_state['values']['style_data'];
   
   // Cast and unset values so JS can handle them better,
-  // Unless vluase is in form ${attribute}
+  // Unless value is in form ${attribute}
   foreach ($form_state['values']['data'] as $key => $value) {
     if ($form_state['values']['data'][$key] === '') {
       unset($form_state['values']['data'][$key]);
@@ -279,6 +294,18 @@ function openlayers_ui_styles_form_submit(&$form, &$form_state) {
         $form_state['values']['data'][$key] = 
           (float) $form_state['values']['data'][$key];
       }
+    }
+  }
+  
+  // Process style plugins.  This allows us to have simpler
+  // arrays for plugins.  
+  foreach ($form_state['values']['data']['plugins'] as $plugin => $settings) {
+    if ($settings['enabled']) {
+      $form_state['values']['data']['plugins'][$plugin] = 
+        isset($settings['options']) ? $settings['options'] : array();
+    }
+    else {
+      unset($form_state['values']['data']['plugins'][$plugin]);
     }
   }
   
@@ -299,4 +326,43 @@ function openlayers_ui_styles_form_submit(&$form, &$form_state) {
   else {
     form_set_error('openlayers', t('Error trying to save style.'));
   }
+}
+
+/**
+ * Get style plugin options.
+ */
+function openlayers_ui_get_style_plugin_options($defaults) {
+  $form = array();
+
+  // Get all available style plugins.
+  foreach (openlayers_style_plugins() as $key => $plugin) {
+    $plugin_class = ctools_plugin_get_class($plugin, 'style_plugin');
+    if (!empty($plugin_class)) {
+      // Create options for oprion form.
+      $options = isset($defaults['plugins'][$key]) ?
+        $defaults['plugins'][$key] : array();
+
+      // Create object
+      $style_plugin = new $plugin_class($options);
+      // Put together fieldset of options.  This should
+      // be improved so that it looks better.
+      $form[$key] = array(
+        '#tree' => TRUE,
+        '#type' => 'fieldset',
+        '#title' => $plugin['title'],
+        '#description' => $plugin['description'],
+        'enabled' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Enabled'),
+          '#default_value' => isset($defaults['plugins'][$key])
+            ? $defaults['plugins'][$key] : FALSE,
+        ),
+      );
+
+      // Add extra options form.
+      $form[$key]['options'] = $style_plugin->options_form($options);
+    }
+  }
+
+  return $form;
 }
