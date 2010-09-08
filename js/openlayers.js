@@ -290,16 +290,18 @@ Drupal.openlayers = {
         {
               var plugin_options = style.plugins[plugin_name];
               var plugin_context_class = Drupal.openlayers.style_plugin[plugin_name];
-              // TODO: check for existance of plugin_context_class here
-              var plugin_context = new plugin_context_class(plugin_options);
+              // Check for existance of plugin_context_class here
+              if ( typeof plugin_context_class === 'function' ) {
+                var plugin_context = new plugin_context_class(plugin_options);
 
-              // Add plugin context functions to global context
-              for (var key in plugin_context) {
+                // Add plugin context functions to global context
+                for (var key in plugin_context) {
                   var newkey = plugin_name + '_' + key;
                   var val = plugin_context[key];
                   if ( typeof val === 'function' ) {
                       newContext[newkey] = OpenLayers.Function.bind(val, plugin_context); // plugin_method_scope);
                   }
+                }
               }
         }
       
