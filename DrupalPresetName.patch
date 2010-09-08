@@ -1,0 +1,23 @@
+? DrupalPresetName.patch
+Index: openlayers.module
+===================================================================
+RCS file: /cvs/drupal-contrib/contributions/modules/openlayers/openlayers.module,v
+retrieving revision 1.69.2.77
+diff -u -p -r1.69.2.77 openlayers.module
+--- openlayers.module	4 Jul 2010 19:23:04 -0000	1.69.2.77
++++ openlayers.module	21 Jul 2010 09:10:01 -0000
+@@ -565,7 +565,13 @@ function openlayers_preset_load($name = 
+   
+   $presets = ctools_export_load_object(
+     'openlayers_map_presets', 'names', array($name));
+-  return !empty($presets[$name]) ? $presets[$name] : FALSE;
++  if ( empty($presets[$name]) ) {
++    return FALSE;
++  } else {
++    $preset = $presets[$name];
++    $preset->data['preset'] = $preset;
++    return $preset;
++  }
+ }
+ 
+ /**
