@@ -88,8 +88,12 @@ function _openlayers_styles_process($styles = array(),
             'style_plugin');
           if (isset($plugin_class)) {
             $plugin = new $plugin_class;
-            // Render the plugin with the style.
-            $plugin->render($styles_info[$i]);
+            // Assign context_properties:
+            foreach ($plugin->get_context_properties() as $prop => $cb) {
+              $styles_info[$i]->data[$prop] = '${' . $p . '_' . $cb . '}';
+            }
+            // Render the plugin 
+            $plugin->render();
           }
         }
       }

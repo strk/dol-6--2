@@ -941,6 +941,16 @@ class openlayers_style_plugin {
   }
 
   /**
+   * Get an array of style property callbacks
+   *
+   * @return
+   *   Array of <property_name> => <callback_name>
+   */
+  function get_context_properties() {
+    return array();
+  }
+
+  /**
    * Initial default options.
    *
    * @return
@@ -964,11 +974,8 @@ class openlayers_style_plugin {
 
   /**
    * Render the style.
-   *
-   * @param $style
-   *   The style passed in to be handled.
    */
-  function render(&$style) {
+  function render() {
     // Render style.
   }
 }

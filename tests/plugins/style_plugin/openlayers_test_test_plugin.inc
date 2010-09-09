@@ -27,10 +27,6 @@ class openlayers_style_plugin_test_plugin extends
    */
   function options_init() {
     return array(
-      'context_properties' => array(
-        'fillOpacity' => 'getFillOpacity',
-        'pointRadius' => 'getPointRadius',
-      ),
       'point_radius_low' => 2,
       'point_radius_high' => 10,
     );
@@ -63,15 +59,20 @@ class openlayers_style_plugin_test_plugin extends
   }
 
   /**
+   * Get an array of style property callbacks
+   */
+  function get_context_properties() {
+    return array(
+      'fillOpacity' => 'getFillOpacity',
+      'pointRadius' => 'getPointRadius',
+    );
+  }
+
+
+  /**
    * Render function
    */
-  function render(&$style) {
-    // For context styling, we want to replace the
-    // style properties with their context value
-    foreach ($this->options['context_properties'] as $prop => $callback) {
-      $style->data[$prop] = '${' . 'openlayers_test_test_plugin_' . $callback . '}';
-    }
-    
+  function render() {
     // Add JS
     drupal_add_js(drupal_get_path('module', 'openlayers_test') .
       '/plugins/style_plugin/openlayers_test_test_plugin.js');
