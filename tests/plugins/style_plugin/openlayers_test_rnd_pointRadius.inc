@@ -8,11 +8,11 @@
 
 // Define plugin for CTools
 $plugin = array(
-  'title' => t('Example Plugin'),
+  'title' => t('TEST: random point radius'),
   'description' => t('Example style plugin for context styling.
     Sets a random fill opacity and point radius.'),
   'style_plugin' => array(
-    'class' => 'openlayers_style_plugin_test_plugin',
+    'class' => 'openlayers_test_rnd_pointRadius',
     'parent' => 'openlayers_style_plugin',
   ),
 );
@@ -20,7 +20,7 @@ $plugin = array(
 /**
  * Style Plugin for testing purposes.
  */
-class openlayers_style_plugin_test_plugin extends 
+class openlayers_test_rnd_pointRadius extends 
   openlayers_style_plugin {
   /**
    * Provide initial values for options.
@@ -63,7 +63,6 @@ class openlayers_style_plugin_test_plugin extends
    */
   function get_context_properties() {
     return array(
-      'fillOpacity' => 'getFillOpacity',
       'pointRadius' => 'getPointRadius',
     );
   }
@@ -75,6 +74,6 @@ class openlayers_style_plugin_test_plugin extends
   function render() {
     // Add JS
     drupal_add_js(drupal_get_path('module', 'openlayers_test') .
-      '/plugins/style_plugin/openlayers_test_test_plugin.js');
+      '/plugins/style_plugin/openlayers_test_rnd_pointRadius.js');
   }
 }
