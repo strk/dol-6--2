@@ -355,7 +355,7 @@ function openlayers_ui_get_style_plugin_options($defaults) {
           '#type' => 'checkbox',
           '#title' => t('Enabled'),
           '#default_value' => isset($defaults['plugins'][$key])
-            ? $defaults['plugins'][$key] : FALSE,
+            ? TRUE : FALSE,
         ),
       );
 
