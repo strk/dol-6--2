@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.render.inc,v 1.3.2.16 2010/04/27 15:50:15 tmcw Exp $
+// $Id: openlayers.render.inc,v 1.3.2.17 2010/09/09 08:57:01 strk Exp $
 
 /**
  * @file
