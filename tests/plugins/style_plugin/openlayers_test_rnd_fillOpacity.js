@@ -15,7 +15,7 @@ Drupal.openlayers.style_plugin.openlayers_test_rnd_fillOpacity = function (param
 /**
  * Style plugin context class methods
  */
-Drupal.openlayers.style_plugin.openlayers_test_test_plugin.prototype = {
+Drupal.openlayers.style_plugin.openlayers_test_rnd_fillOpacity.prototype = {
 
   // Fill opacity context.  Sets random fill opacity.
   'getFillOpacity' : function(feature) {
