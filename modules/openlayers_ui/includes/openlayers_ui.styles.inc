@@ -259,8 +259,8 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
       '#type' => !isset($prop['options']) ? 'textfield' : 'select',
       '#title' => 'Value', // $key,
       //'#description' => $prop['desc'],
-      '#default_value' => isset($style->data[$key]['value']) ?
-        $style->data[$key]['value'] : $prop['default'],
+      '#default_value' => isset($style->data[$key]) ?
+        $style->data[$key] : $prop['default'],
     );
     
     // Add options if needed
@@ -335,7 +335,7 @@ function openlayers_ui_styles_form_submit(&$form, &$form_state) {
       }
     }
   }
-  
+
   // Process style plugins.  This allows us to have simpler
   // arrays for plugins.  
   foreach ($form_state['values']['data']['plugins'] as $plugin => $settings) {
@@ -347,6 +347,11 @@ function openlayers_ui_styles_form_submit(&$form, &$form_state) {
       unset($form_state['values']['data']['plugins'][$plugin]);
     }
   }
+
+  // TODO: tweak data[$key]['value'] to be data[$key]
+  //       and figure out data[plugins]
+  
+  
   
   $style = new stdClass();
   $style->name = $form_state['values']['name'];
