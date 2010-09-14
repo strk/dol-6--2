@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_cck.test,v 1.1.2.5 2010/09/08 21:24:25 tmcw Exp $
+// $Id: openlayers_cck.test,v 1.1.2.7 2010/09/11 17:38:11 zzolo Exp $
 
 /**
  * @file
@@ -7,7 +7,7 @@
  */
  
 // Prevents issues if CCK is not installed
-if (!class_exists(ContentCrudTestCase)) {
+if (!class_exists('ContentCrudTestCase')) {
   return;
 }
 
@@ -24,7 +24,10 @@ class OpenLayersCCKWidgetTest extends ContentCrudTestCase {
   }
 
   function setUp() {
-    parent::setUp('openlayers', 'openlayers_cck', 'ctools');
+    // Note that the CRUD testing for CCK assumes the following modules
+    // as well as these: content, text, schema
+    // Often one does not have schema available and exceptions will happen.
+    parent::setUp('ctools', 'openlayers', 'openlayers_cck');
     $this->loginWithPermissions();
     $this->acquireContentTypes(1);
     module_load_include('inc', 'cck', 'tests/content.crud.test');

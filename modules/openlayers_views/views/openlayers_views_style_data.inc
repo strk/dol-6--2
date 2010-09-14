@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_views_style_data.inc,v 1.1.2.24 2010/09/05 21:24:58 tmcw Exp $
+// $Id: openlayers_views_style_data.inc,v 1.1.2.27 2010/09/12 20:26:53 zzolo Exp $
 
 /**
  * @file
@@ -21,7 +21,7 @@ class openlayers_views_style_data extends views_plugin_style {
    */
   function option_definition() {
     $options = parent::option_definition();
-    $options['data_source'] = array('default' => array());
+    $options['data_source'] = 'openlayers_wkt';
     return $options;
   }
 
@@ -213,6 +213,14 @@ class openlayers_views_style_data extends views_plugin_style {
       $fields[$field_id] = $handler->definition;
       $fields[$field_id]['field_alias'] = $handler->field_alias;
     }
+    
+    // Small fix to solve backwards compatability and bad commit
+    // and release.  This should be in an update function.
+    // See: http://drupal.org/node/895082
+    $ds = $data_source['value'];       
+    if (is_array($ds)) {
+      $ds = array_shift(array_keys($data_source['value']));
+    } 
 
     // Build feature. We create one feature per field per row.
 
@@ -223,7 +231,8 @@ class openlayers_views_style_data extends views_plugin_style {
       foreach ($records as $id => $record) {
         $feature = array();
         $feature['attributes']['name'] = $id;
-        switch($data_source['value']) {
+
+        switch ($ds) {
           case 'other_latlon':
             $lat_field = $fields[$data_source['other_lat']]['field_alias'];
             $lon_field = $fields[$data_source['other_lon']]['field_alias'];
@@ -322,7 +331,7 @@ class openlayers_views_style_data extends views_plugin_style {
           }
         }
 
-        switch ($data_source['value']) {
+        switch ($ds) {
           case 'other_latlon':
             $lat_field = $fields[$data_source['other_lat']]['field_alias'];
             $lon_field = $fields[$data_source['other_lon']]['field_alias'];
