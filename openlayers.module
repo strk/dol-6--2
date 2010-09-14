@@ -927,6 +927,14 @@ class openlayers_layer_type {
 class openlayers_style_plugin {
 
   /**
+   * Return true if this plugin can handle
+   * the given property
+   */
+  function can_handle_property($propname) {
+    return array_key_exists($propname, $this->get_context_properties());
+  }
+
+  /**
    * Get an array of style property callbacks
    *
    * @return
