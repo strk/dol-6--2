@@ -272,7 +272,7 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
     $handling_plugins = openlayers_ui_get_style_plugins_for_property($key);
     if ( empty($handling_plugins) ) continue;
 
-    $plugin_options = array('' => 'None');
+    $plugin_options = array('' => '- none -');
     foreach ($handling_plugins as $plugname => $plug) {
       $plugin_options[$plugname] = $plug['title'];
     }
