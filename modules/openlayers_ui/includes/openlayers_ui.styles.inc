@@ -299,8 +299,10 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
 
   
   // Add style plugins
+/*
   $form['data']['plugins'] = openlayers_ui_get_style_plugin_options(
     isset($style->data) ? $style->data : array());
+*/
 
   $form['submit'] = array(
     '#type' => 'submit',
