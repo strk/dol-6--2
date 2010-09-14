@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.36 2010/08/06 20:35:15 tmcw Exp $
+// $Id: openlayers.js,v 1.47.2.37 2010/09/14 07:13:40 strk Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -151,8 +151,19 @@ Drupal.openlayers = {
    * @param openlayers OpenLayers Map Object
    */
   'addLayers': function(map, openlayers) {
+
+    var sorted = [];
     for (var name in map.layers) {
+      sorted.push({'name': name, 'weight': map.layers[name].weight });
+    };
+    sorted.sort(function(a, b) {
+      var x = a.weight; var y = b.weight;
+      return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
+
+    for (var i=0; i<sorted.length; ++i) {
       var layer;      
+      var name = sorted[i].name;
       var options = map.layers[name];
       
       // Add reference to our layer ID
