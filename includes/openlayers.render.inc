@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.render.inc,v 1.3.2.17 2010/09/09 08:57:01 strk Exp $
+// $Id: openlayers.render.inc,v 1.3.2.18 2010/09/14 07:13:40 strk Exp $
 
 /**
  * @file
@@ -20,10 +20,12 @@
 function _openlayers_layers_process($layers = array(), &$map = array()) {
   $layer_data = array();
 
+  $weight = 0;
   foreach ($layers as $layer) {
     if ($layer_object = openlayers_layer_load($layer)) {
       $layer_object->render($map);
       $layer_object->data['title'] = $layer_object->title;
+      $layer_object->data['weight'] = ++$weight;
       $layer_data[$layer_object->name] = $layer_object->data;
     }
   }
