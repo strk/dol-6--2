@@ -338,12 +338,10 @@ function openlayers_ui_get_style_plugin_options($defaults) {
   foreach (openlayers_style_plugins() as $key => $plugin) {
     $plugin_class = ctools_plugin_get_class($plugin, 'style_plugin');
     if (!empty($plugin_class)) {
-      // Create options for oprion form.
-      $options = isset($defaults['plugins'][$key]) ?
-        $defaults['plugins'][$key] : array();
 
       // Create object
-      $style_plugin = new $plugin_class($options);
+      $style_plugin = new $plugin_class;
+
       // Put together fieldset of options.  This should
       // be improved so that it looks better.
       $form[$key] = array(
@@ -358,6 +356,10 @@ function openlayers_ui_get_style_plugin_options($defaults) {
             ? TRUE : FALSE,
         ),
       );
+
+      // Create options for plugin options form.
+      $options = isset($defaults['plugins'][$key]) ?
+        $defaults['plugins'][$key] : array();
 
       // Add extra options form.
       $form[$key]['options'] = $style_plugin->options_form($options);
