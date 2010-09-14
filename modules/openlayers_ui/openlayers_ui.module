@@ -324,6 +324,14 @@ function openlayers_ui_menu() {
     'file' => 'includes/openlayers_ui.presets.inc',
     'type' => MENU_CALLBACK,
   );
+  $items['openlayers/ahah/style_plugin/%'] = array( 	 
+    'title' => 'OpenLayers Style Plugin AHAH',
+    'page callback' => 'openlayers_ui_style_plugin_ahah',
+    //'page arguments' => array(4),
+    'access callback' => TRUE,
+    'file' => 'includes/openlayers_ui.styles.inc',
+    'type' => MENU_CALLBACK, 
+  );
 
   return $items;
 }
