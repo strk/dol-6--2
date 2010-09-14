@@ -925,20 +925,6 @@ class openlayers_layer_type {
  * All other parent classes can be autoloaded through ctools.
  */
 class openlayers_style_plugin {
-  var $options;
-
-  /**
-   * Constructor
-   *
-   * Takes options sent in and adds them to the
-   * class.
-   *
-   * @param $options
-   *   Array of options.
-   */
-  function __construct($options = array()) {
-    $this->options = $options + $this->options_init();
-  }
 
   /**
    * Get an array of style property callbacks
