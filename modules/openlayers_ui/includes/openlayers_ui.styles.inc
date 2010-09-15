@@ -293,26 +293,30 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
       '#type' => 'select',
       '#options' => $plugin_options,
       '#default_value' => $def_use_plugin,
-      '#id' => $key . '-uses-plugin',
       '#ahah' => array(
         'path' => 'openlayers/ahah/style_plugin/' . $key,
-        'wrapper' => $key . '-style-plugins',
+        'wrapper' => $key . '-style-plugin',
         'method' => 'replace',
         'effect' => 'fade', // 'fade', 'none', 'slide'
       )
     );
 
-    $form['data'][$key]['plugin'] = array(
-      '#value' => '<div id="' . $key . '-style-plugins"></div>'
+    // Hackish... but is that new for HTML ? ...
+    $form['data'][$key]['plugin_conf_start'] = array(
+      '#value' => '<div id="' . $key . '-style-plugin">'
     );
 
     if ( is_array($style->data[$key]) ) {
-      var_dump($style->data[$key]);
       $defaults = $style->data[$key]['conf'];
       $plugname = $style->data[$key]['plugin'];
-      $form['data'][$key]['plugin'] =
+      $form['data'][$key]['conf'] =
         openlayers_ui_get_style_plugin_form($def_use_plugin, $defaults);
-    }
+    } 
+
+    // Hackish... but is that new for HTML ? ...
+    $form['data'][$key]['plugin_conf_end'] = array(
+      '#value' => '</div>'
+    );
 
   }
 
