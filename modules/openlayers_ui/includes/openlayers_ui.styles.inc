@@ -305,6 +305,15 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
     $form['data'][$key]['plugin'] = array(
       '#value' => '<div id="' . $key . '-style-plugins"></div>'
     );
+
+    if ( is_array($style->data[$key]) ) {
+      var_dump($style->data[$key]);
+      $defaults = $style->data[$key]['conf'];
+      $plugname = $style->data[$key]['plugin'];
+      $form['data'][$key]['plugin'] =
+        openlayers_ui_get_style_plugin_form($def_use_plugin, $defaults);
+    }
+
   }
 
   $form['submit'] = array(
@@ -416,7 +425,16 @@ function openlayers_ui_get_style_plugin_form($plugname, $defaults) {
 
   // Create object and ask it for options
   $style_plugin = new $plugin_class;
-  return $style_plugin->options_form($defaults);
+
+  $form = array (
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    //'#title' => $plugin['title'],
+    '#description' => $plugin['description'],
+    'conf' => $style_plugin->options_form($defaults)
+  );
+
+  return $form;
 }
 
 function openlayers_ui_style_plugin_ahah($propname) {
@@ -433,39 +451,9 @@ function openlayers_ui_style_plugin_ahah($propname) {
     return;
   }
 
-  $available_plugins = openlayers_style_plugins();
-  if ( ! $available_plugins[$plugname] ) {
-    drupal_json(array(
-      'status' => FALSE,
-      'data' => 'Unknown style plugin "' . $plugname . '"'
-    ));
-    return;
-  }
-
-  $plugin = $available_plugins[$plugname];
-  $plugin_class = ctools_plugin_get_class($plugin, 'style_plugin');
-  if (empty($plugin_class)) {
-    drupal_json(array(
-      'status' => FALSE,
-      'data' => 'Malformed style plugin "'
-        . $plugname . '" : misses style_plugin class'
-    ));
-    return $form; 
-  }
-
   $defaults = array(); // TODO: get from $propform
-
-  // Create object and ask it for options
-  $style_plugin = new $plugin_class;
-
-  $form = array (
-    '#parents' => array('data', $propname, 'plugin'),
-    '#type' => 'fieldset',
-    '#tree' => TRUE,
-    //'#title' => $plugin['title'],
-    '#description' => $plugin['description'],
-    'conf' => $style_plugin->options_form($defaults)
-  );
+  $form = openlayers_ui_get_style_plugin_form($plugname, $defaults);
+  $form['#parents'] = array('data', $propname, 'plugin');
 
   $form_state = array(); // TODO: what to do with this ?
   $plugform_built = form_builder('style_plugin_form', $form, $form_state);
