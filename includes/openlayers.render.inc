@@ -76,36 +76,23 @@ function _openlayers_styles_process($styles = array(),
 
   // Get styles info array
   $styles_info = openlayers_styles();
+  $style_plugins = openlayers_style_plugins();
 
   // Process with handler if available.
-  $used_plugins = array();
   foreach ($styles_info as $i => $style) {
     // Check for property plugins.
     foreach ($style->data as $prop => $propval) {
-      if ( is_array($propval) ) {
-        $plugname = $propval['plugin'];
-        if ( ! empty($plugname) ) {
-          // the above should never happen, except
-          // for cases in which the old style plugin 
-          // system was used (for prop == 'plugins')
-          $used_plugins[$plugname] = TRUE;
+      if ( is_array($propval) && !empty($propval['plugin'])) {
+        // $used_plugins[$plugname] = TRUE;
+        $plugin = $style_plugins[$propval['plugin']];
+        $plugin_class = ctools_plugin_get_class($plugin, 'style_plugin');
+        if (isset($plugin_class)) {
+          $plugin = new $plugin_class;
+          $plugin->render();
         }
       }
     }
   }
-
-  if ( ! empty($used_plugins) ) {
-    $style_plugins = openlayers_style_plugins();
-    foreach (array_keys($used_plugins) as $plugname) {
-      $plug = $style_plugins[$plugname];
-      $plugin_class = ctools_plugin_get_class($plug, 'style_plugin');
-      if (isset($plugin_class)) {
-        $plugin = new $plugin_class;
-        $plugin->render();
-      }
-    }
-  }
-
 
   // Go through styles
   $processed = array();
