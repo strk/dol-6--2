@@ -309,7 +309,7 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
     if ( is_array($style->data[$key]) ) {
       $defaults = $style->data[$key]['conf'];
       $plugname = $style->data[$key]['plugin'];
-      $form['data'][$key]['conf'] =
+      $form['data'][$key]['plugin'] =
         openlayers_ui_get_style_plugin_form($def_use_plugin, $defaults);
     } 
 
