@@ -370,8 +370,10 @@ function openlayers_ui_styles_form_submit(&$form, &$form_state) {
     } else {
       $spec = array(
         'plugin' => $data[$key]['uses_plugin'],
-        'conf' => $data[$key]['plugin']['conf']
       );
+      if ( isset($data[$key]['plugin']['conf']) ) {
+        $spec['conf'] = $data[$key]['plugin']['conf'];
+      }
       $data[$key] = $spec;
     }
   }
