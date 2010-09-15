@@ -8,11 +8,11 @@
 
 // Define plugin for CTools
 $plugin = array(
-  'title' => t('TEST: random fill opacity'),
-  'description' => t('Example style plugin for context styling.
-    Sets a random fill opacity.'),
+  'title' => t('TEST: random factor'),
+  'description' => t('Example style plugin for context styling. '
+    . 'Provides a random 0..1 factors.'),
   'style_plugin' => array(
-    'class' => 'openlayers_test_rnd_fillOpacity',
+    'class' => 'openlayers_test_rnd_factor',
     'parent' => 'openlayers_style_plugin',
   ),
 );
@@ -20,7 +20,7 @@ $plugin = array(
 /**
  * Style Plugin for testing purposes.
  */
-class openlayers_test_rnd_fillOpacity extends 
+class openlayers_test_rnd_factor extends 
   openlayers_style_plugin {
   /**
    * Provide initial values for options.
@@ -43,7 +43,9 @@ class openlayers_test_rnd_fillOpacity extends
    */
   function get_context_properties() {
     return array(
-      'fillOpacity' => 'getFillOpacity',
+      'fillOpacity' => 'getFactor',
+      'strokeOpacity' => 'getFactor',
+      'graphicOpacity' => 'getFactor',
     );
   }
 
@@ -54,6 +56,6 @@ class openlayers_test_rnd_fillOpacity extends
   function render() {
     // Add JS
     drupal_add_js(drupal_get_path('module', 'openlayers_test') .
-      '/plugins/style_plugin/openlayers_test_rnd_fillOpacity.js');
+      '/plugins/style_plugin/openlayers_test_rnd_factor.js');
   }
 }

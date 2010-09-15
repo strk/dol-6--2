@@ -304,7 +304,7 @@ Drupal.openlayers = {
 
               // Add plugin context functions to global context
               for (var key in plugin_context) {
-                var newkey = plugin_name + '_' + key;
+                var newkey = plugin_name + '_' + propname + '_' + key;
                 var val = plugin_context[key];
                 if ( typeof val === 'function' ) {
                     newContext[newkey] = OpenLayers.Function.bind(val,
