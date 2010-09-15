@@ -266,6 +266,7 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
       '#title' => $key,
       '#description' => $prop['desc'],
       '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
     );
 
     $def_value = $prop['default'];
