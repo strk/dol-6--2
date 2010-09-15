@@ -215,7 +215,10 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
   // Pass style data along
   $form['style_data'] = array(
     '#type' => 'value',
-    '#value' => $properties,
+    '#value' => array(
+      'definitions' => $properties,
+      'defaults' => $style->data
+    )
   );
 
   // Style object basics
@@ -342,7 +345,7 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
  */
 function openlayers_ui_styles_form_submit(&$form, &$form_state) {
 
-  $style_data = $form_state['values']['style_data'];
+  $prop_defn = $form_state['values']['style_data']['definitions'];
   
   //$data = $form_state['values']['data'];
   $data = $form_state['clicked_button']['#post']['data'];
@@ -355,12 +358,12 @@ function openlayers_ui_styles_form_submit(&$form, &$form_state) {
       if ($data[$key] === '') {
         unset($data[$key]);
       }
-      elseif (isset($style_data[$key]['type']) &&
+      elseif (isset($prop_defn[$key]['type']) &&
           strpos($data[$key], '${') !== 0) {
-        if ($style_data[$key]['type'] == 'integer') {
+        if ($prop_defn[$key]['type'] == 'integer') {
           $data[$key] = (int) $data[$key];
         }
-        elseif ($style_data[$key]['type'] == 'float') {
+        elseif ($prop_defn[$key]['type'] == 'float') {
           $data[$key] = (float) $data[$key];
         }
       }
@@ -453,22 +456,38 @@ function openlayers_ui_get_style_plugin_form($plugname, $defaults) {
 
 function openlayers_ui_style_plugin_ahah($propname) {
 
-  $propform = $_POST["data"][$propname];
+  $posted = $_POST["data"][$propname];
+  $plugname = $posted['uses_plugin'];
 
-  $plugname = $propform['uses_plugin'];
+/*
+  ob_start();
+  echo "<PRE>";
+  var_dump($propname);
+  $output = ob_get_clean();
+  drupal_json(array('status' => TRUE, 'data' => $output));
+  return;
+*/
+
+  // Get cached form 
+  $form_state = array('storage' => NULL, 'submitted' => FALSE);
+  $form_build_id = $_POST['form_build_id'];
+  $form_cached = form_get_cache($form_build_id, $form_state);
+
+  // Get style_data from cached form, and defaults
+  $style_data = $form_cached['style_data']['#value'];
+  $defaults = $style_data['defaults'];
+
+
+
   if ( ! $plugname ) {
 
-    // Fetch prop from somewhere !
-
-    //$form_state = array('storage' => NULL, 'submitted' => FALSE);
-    //$form_build_id = $_POST['form_build_id'];
-    //$form = form_get_cache($form_build_id, $form_state);
-    //$properties = $form['style_data']['#value'];
-    $properties = openlayers_ui_styles_get_properties();
+    // Find default value
+    $properties = $style_data['definitions'];
     $prop = $properties[$propname];
-
     $def_value = $prop['default'];
-    // TODO: check if we have data saved in the style already ?
+    if ( isset($defaults[$propname]) && ! is_array($defaults[$propname]) ) {
+      $def_value = $defaults[$propname];
+    }
 
     $form = array(
       '#type' => !isset($prop['options']) ? 'textfield' : 'select',
@@ -484,9 +503,25 @@ function openlayers_ui_style_plugin_ahah($propname) {
 
   } else {
 
-    $defaults = array(); // TODO: get from $propform
-    $form = openlayers_ui_get_style_plugin_form($plugname, $defaults);
+    // Find default value
+    $defs = array();
+    if ( isset($defaults[$propname]) && is_array($defaults[$propname])
+      && $defaults[$propname]['plugin'] == $plugname ) {
+      $defs = $defaults[$propname]['conf'];
+    }
+
+/*
+  ob_start();
+  echo "<PRE>";
+  var_dump($defs);
+  $output = ob_get_clean();
+  drupal_json(array('status' => TRUE, 'data' => $output));
+  return;
+*/
+
+    $form = openlayers_ui_get_style_plugin_form($plugname, $defs);
     $form['#parents'] = array('data', $propname, 'plugin');
+
   }
 
 
@@ -500,6 +535,8 @@ function openlayers_ui_style_plugin_ahah($propname) {
   echo "<PRE>";
   var_dump($plugform_built);
   $output = ob_get_clean();
+  drupal_json(array('status' => TRUE, 'data' => $output));
+  return;
 */
 
   // Final rendering callback.
