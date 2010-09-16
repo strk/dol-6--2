@@ -1,10 +1,10 @@
-// $Id: raw.js,v 1.1.2.3 2010/09/03 18:06:45 tmcw Exp $
+// $Id: raw.js,v 1.1.2.4 2010/09/15 21:28:21 tmcw Exp $
 
 /**
  * OpenLayers Raw Layer Handler
  */
 Drupal.openlayers.layer.openlayers_raw = function(title, map, options) {
-  options.options = options.options || {}
+  options.options = options.options || {};
 
   // Note, so that we do not pass all the features along to the Layer
   // options, we use the options.options to give to Layer
