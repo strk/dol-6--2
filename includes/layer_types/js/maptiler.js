@@ -1,4 +1,4 @@
-// $Id: maptiler.js,v 1.1.2.1 2010/05/30 21:46:15 zzolo Exp $
+// $Id: maptiler.js,v 1.1.2.2 2010/09/15 21:28:21 tmcw Exp $
 
 /**
  * @file
@@ -8,7 +8,7 @@
 /**
  * Openlayer layer handler for TMS layer
  */
-Drupal.openlayers.layer.maptiler = function (title, map, options) {
+Drupal.openlayers.layer.maptiler = function(title, map, options) {
   if (options.maxExtent !== undefined) {
     options.maxExtent = new OpenLayers.Bounds.fromArray(options.maxExtent);
   }
@@ -17,14 +17,14 @@ Drupal.openlayers.layer.maptiler = function (title, map, options) {
     var x = Math.round((bounds.left - this.maxExtent.left) / (res * this.tileSize.w));
     var y = Math.round((bounds.bottom - this.tileOrigin.lat) / (res * this.tileSize.h));
     var z = this.map.getZoom();
-    if (this.map.baseLayer.name == 'Virtual Earth Roads' || 
-      this.map.baseLayer.name == 'Virtual Earth Aerial' || 
+    if (this.map.baseLayer.name == 'Virtual Earth Roads' ||
+      this.map.baseLayer.name == 'Virtual Earth Aerial' ||
       this.map.baseLayer.name == 'Virtual Earth Hybrid') {
       z = z + 1;
     }
-    return this.url + z + "/" + x + "/" + y + "." + this.type;
+    return this.url + z + '/' + x + '/' + y + '.' + this.type;
   }
-  options.projection = 'EPSG:' + options.projection
+  options.projection = 'EPSG:' + options.projection;
   var layer = new OpenLayers.Layer.TMS(title, options.base_url, options);
   return layer;
 };
