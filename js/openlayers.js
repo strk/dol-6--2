@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.38 2010/09/16 10:26:05 strk Exp $
+// $Id: openlayers.js,v 1.47.2.39 2010/09/17 12:17:16 strk Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -176,6 +176,8 @@ Drupal.openlayers = {
 
         if (layer.isBaseLayer === false) {
           layer.displayInLayerSwitcher = !!(!map.layer_switcher || map.layer_switcher[name]);
+        } else {
+          layer.displayInLayerSwitcher = true;
         }
 
         if (map.center.wrapdateline === '1') {
