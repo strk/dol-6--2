@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_views_style_data.inc,v 1.1.2.27 2010/09/12 20:26:53 zzolo Exp $
+// $Id: openlayers_views_style_data.inc,v 1.1.2.28 2010/09/23 14:39:24 tmcw Exp $
 
 /**
  * @file
@@ -21,7 +21,7 @@ class openlayers_views_style_data extends views_plugin_style {
    */
   function option_definition() {
     $options = parent::option_definition();
-    $options['data_source'] = 'openlayers_wkt';
+    $options['data_source'] = array('default' => 'openlayers_wkt');
     return $options;
   }
 

@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.39 2010/09/17 12:17:16 strk Exp $
+// $Id: openlayers.js,v 1.47.2.40 2010/09/24 16:15:34 rsoden Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -174,7 +174,7 @@ Drupal.openlayers = {
 
         layer.visibility = !!(!map.layer_activated || map.layer_activated[name]);
 
-        if (layer.isBaseLayer === false) {
+        if (layer.isBaseLayer == false) {
           layer.displayInLayerSwitcher = !!(!map.layer_switcher || map.layer_switcher[name]);
         } else {
           layer.displayInLayerSwitcher = true;
