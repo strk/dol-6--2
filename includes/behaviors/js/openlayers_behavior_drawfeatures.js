@@ -1,4 +1,4 @@
-// $Id: openlayers_behavior_drawfeatures.js,v 1.1.2.15 2010/08/26 16:23:52 tmcw Exp $
+// $Id: openlayers_behavior_drawfeatures.js,v 1.1.2.16 2010/09/27 21:45:44 tmcw Exp $
 
 /**
  * @file
@@ -53,8 +53,11 @@ Drupal.behaviors.openlayers_behavior_drawfeatures = function(context) {
     if (this.element.text() != '') {
       var wktFormat = new OpenLayers.Format.WKT();
       var features = wktFormat.read(this.element.text());
-      
+
       if (features.constructor == Array) {
+        if (features.length == 1 && features[0] == undefined) {
+          features = [];
+        }
         for (var i in features) {
           features[i].geometry = features[i].geometry.transform(
             new OpenLayers.Projection('EPSG:4326'),
@@ -81,8 +84,6 @@ Drupal.behaviors.openlayers_behavior_drawfeatures = function(context) {
     dataLayer.events.register('featuremodified', this,
       openlayers_behavior_drawfeatures_update);
 
-
-    
     var control = new OpenLayers.Control.EditingToolbar(dataLayer);
     data.openlayers.addControl(control);
     control.activate();
