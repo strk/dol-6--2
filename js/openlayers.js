@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.41 2010/09/27 21:45:44 tmcw Exp $
+// $Id: openlayers.js,v 1.47.2.42 2010/09/28 15:41:23 strk Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -272,7 +272,6 @@ Drupal.openlayers = {
 
           // Push new features
           newFeatures.push(newFeature);
-          }
         }
       }
     }
