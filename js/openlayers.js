@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.40 2010/09/24 16:15:34 rsoden Exp $
+// $Id: openlayers.js,v 1.47.2.41 2010/09/27 21:45:44 tmcw Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -226,11 +226,15 @@ Drupal.openlayers = {
         var newFeatureSet = [];
 
         // Check to see if it is a new feature, or an array of new features.
-        if (typeof(newFeatureObject[0]) === 'undefined'){
+        if ('geometry' in newFeatureObject){
           newFeatureSet[0] = newFeatureObject;
         }
-        else{
+        else {
           newFeatureSet = newFeatureObject;
+        }
+
+        if (newFeatureSet.length == 1 && newFeatureSet[0] == undefined) {
+          newFeatureSet = [];
         }
 
         // Go through new features
@@ -268,6 +272,7 @@ Drupal.openlayers = {
 
           // Push new features
           newFeatures.push(newFeature);
+          }
         }
       }
     }
