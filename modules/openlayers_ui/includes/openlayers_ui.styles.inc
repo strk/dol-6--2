@@ -282,25 +282,26 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
 
     // Add plugin options, if any
     $handling_plugins = openlayers_ui_get_style_plugins_for_property($key);
-    //if ( empty($handling_plugins) ) continue;
 
-    $plugin_options = array('' => 'Manual setting');
-    foreach ($handling_plugins as $plugname => $plug) {
-      $plugin_options[$plugname] = '[Plugin] ' . $plug['title'];
+    if ( ! empty($handling_plugins) ) {
+      $plugin_options = array('' => 'NO');
+      foreach ($handling_plugins as $plugname => $plug) {
+        $plugin_options[$plugname] = $plug['title'];
+      }
+
+      $form['data'][$key]['uses_plugin'] = array(
+        '#title' => t('Use plugin'),
+        '#type' => 'select',
+        '#options' => $plugin_options,
+        '#default_value' => $def_use_plugin,
+        '#ahah' => array(
+          'path' => 'openlayers/ahah/style_plugin/' . $key,
+          'wrapper' => $key . '-style-plugin',
+          'method' => 'replace',
+          'effect' => 'fade', // 'fade', 'none', 'slide'
+        )
+      );
     }
-
-    $form['data'][$key]['uses_plugin'] = array(
-      '#title' => t('Use'),
-      '#type' => 'select',
-      '#options' => $plugin_options,
-      '#default_value' => $def_use_plugin,
-      '#ahah' => array(
-        'path' => 'openlayers/ahah/style_plugin/' . $key,
-        'wrapper' => $key . '-style-plugin',
-        'method' => 'replace',
-        'effect' => 'fade', // 'fade', 'none', 'slide'
-      )
-    );
 
     // Hackish... but is that new for HTML ? ...
     $form['data'][$key]['plugin_conf_start'] = array(
@@ -315,8 +316,6 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
     }  else {
       $form['data'][$key]['value'] = array(
         '#type' => !isset($prop['options']) ? 'textfield' : 'select',
-        //'#title' => 'Value', // $key,
-        //'#description' => $prop['desc'],
         '#default_value' => $def_value
       );
       
