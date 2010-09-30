@@ -284,7 +284,7 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
     $handling_plugins = openlayers_ui_get_style_plugins_for_property($key);
 
     if ( ! empty($handling_plugins) ) {
-      $plugin_options = array('' => 'NO');
+      $plugin_options = array('' => t('none'));
       foreach ($handling_plugins as $plugname => $plug) {
         $plugin_options[$plugname] = $plug['title'];
       }
@@ -429,8 +429,8 @@ function openlayers_ui_get_style_plugin_form($plugname, $defaults) {
 
   $available = openlayers_style_plugins();
   if ( ! $available[$plugname] ) {
-    watchdog('openlayers_ui', 'Style plugin !name unknown', array(),
-      WATCHDOG_ERROR);
+    watchdog('openlayers_ui', 'Style plugin !name unknown',
+      array('!name' => $plugname), WATCHDOG_ERROR);
     return $form;
   }
 
@@ -438,7 +438,7 @@ function openlayers_ui_get_style_plugin_form($plugname, $defaults) {
   $plugin_class = ctools_plugin_get_class($plugin, 'style_plugin');
   if (empty($plugin_class)) {
     watchdog('openlayers_ui', 'Style plugin !name does not have a class?!',
-      array(), WATCHDOG_ERROR);
+      array('!name' => $plugname), WATCHDOG_ERROR);
     return $form; 
   }
 
