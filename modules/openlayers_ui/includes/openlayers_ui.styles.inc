@@ -461,15 +461,6 @@ function openlayers_ui_style_plugin_ahah($propname) {
   $posted = $_POST["data"][$propname];
   $plugname = $posted['uses_plugin'];
 
-/*
-  ob_start();
-  echo "<PRE>";
-  var_dump($propname);
-  $output = ob_get_clean();
-  drupal_json(array('status' => TRUE, 'data' => $output));
-  return;
-*/
-
   // Get cached form 
   $form_state = array('storage' => NULL, 'submitted' => FALSE);
   $form_build_id = $_POST['form_build_id'];
