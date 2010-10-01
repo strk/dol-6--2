@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.render.inc,v 1.3.2.18 2010/09/14 07:13:40 strk Exp $
+// $Id: openlayers.render.inc,v 1.3.2.19 2010/10/01 12:54:04 strk Exp $
 
 /**
  * @file
@@ -68,7 +68,7 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
  * @param $map
  *   Map array
  * @return $processed
- *   Array of processed styles ( <style_name> => <style_array> )
+ *   Indexed array of processed styles ( <style_name> => <style_array> )
  */
 function _openlayers_styles_process($styles = array(), 
   $layer_styles = array(), &$map = array()) {
