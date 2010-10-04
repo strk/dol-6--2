@@ -281,14 +281,50 @@ Drupal.openlayers = {
       layer.addFeatures(newFeatures);
     }
   },
+  /**
+   * Build an OpenLayers style from a drupal style object
+   *
+   * @param map Drupal settings object for the map
+   * @param style Drupal settings object for the style 
+   */
+  'buildStyle': function(map, style) {
+      // Build context object and callback values (if needed)
+      var newContext = {}
+      for (var propname in style) {
+        if (typeof style[propname] == 'object') {
+          var plugin_name = style[propname]['plugin'];
+          var plugin_options = style[propname]['conf'];
+          var plugin_class = Drupal.openlayers.style_plugin[plugin_name];
+          // Check for existance of plugin_context_class here
+          if ( typeof plugin_class === 'function' ) {
+            var plugin_context = new plugin_class(plugin_options);
+
+            // Add plugin context functions to global context
+            for (var key in plugin_context) {
+              var newkey = plugin_name + '_' + propname + '_' + key;
+              var val = plugin_context[key];
+              if ( typeof val === 'function' ) {
+                  newContext[newkey] = OpenLayers.Function.bind(val,
+                    plugin_context); 
+              }
+            }
+          }
+          style[propname] = '${' + newkey + '}';
+        }
+      }
+
+      // Put together style_name
+      var olStyle = new OpenLayers.Style(style, { context: newContext } );
+      return olStyle;
+  },
   'getStyleMap': function(map, layername) {
     if (map.styles) {
 
       var stylesAdded = {};
 
       // Grab and map base styles.
-      for (var style in map.styles) {
-        stylesAdded[style] = new OpenLayers.Style(map.styles[style]);
+      for (var style_name in map.styles) {
+        stylesAdded[style] = new OpenLayers.Style(map.styles[style_name]);
       }
 
       // Implement layer-specific styles.
@@ -297,34 +333,8 @@ Drupal.openlayers = {
         var style_name = map.layer_styles[layername]; 
         var style = map.styles[style_name]; // TODO: skip if undefined
 
-        // Build context object and callback values
-        var newContext = {}
-        for (var propname in style) {
-          if (typeof style[propname] == 'object') {
-            var plugin_name = style[propname]['plugin'];
-            var plugin_options = style[propname]['conf'];
-            var plugin_class = Drupal.openlayers.style_plugin[plugin_name];
-            // Check for existance of plugin_context_class here
-            if ( typeof plugin_class === 'function' ) {
-              var plugin_context = new plugin_class(plugin_options);
+        stylesAdded['default'] = stylesAdded['select'] = this.buildStyle(map, style);
 
-              // Add plugin context functions to global context
-              for (var key in plugin_context) {
-                var newkey = plugin_name + '_' + propname + '_' + key;
-                var val = plugin_context[key];
-                if ( typeof val === 'function' ) {
-                    newContext[newkey] = OpenLayers.Function.bind(val,
-                      plugin_context); 
-                }
-              }
-            }
-            style[propname] = '${' + newkey + '}';
-          }
-        }
-
-        // Put together style_name
-        stylesAdded['default'] = stylesAdded['select'] = new OpenLayers.Style(style, 
-            { context: newContext } );
       }
       
       return new OpenLayers.StyleMap(stylesAdded);
