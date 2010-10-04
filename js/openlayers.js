@@ -322,27 +322,6 @@ Drupal.openlayers = {
           }
         }
 
-        // Define parameters from plugin, if available
-        var plugins = map.styles[style_name].plugins;
-        for (var plugin_name in style.plugins)
-        {
-              var plugin_options = style.plugins[plugin_name];
-              var plugin_context_class = Drupal.openlayers.style_plugin[plugin_name];
-              // Check for existance of plugin_context_class here
-              if ( typeof plugin_context_class === 'function' ) {
-                var plugin_context = new plugin_context_class(plugin_options);
-
-                // Add plugin context functions to global context
-                for (var key in plugin_context) {
-                  var newkey = plugin_name + '_' + key;
-                  var val = plugin_context[key];
-                  if ( typeof val === 'function' ) {
-                      newContext[newkey] = OpenLayers.Function.bind(val, plugin_context); // plugin_method_scope);
-                  }
-                }
-              }
-        }
-      
         // Put together style_name
         stylesAdded['default'] = stylesAdded['select'] = new OpenLayers.Style(style, 
             { context: newContext } );
