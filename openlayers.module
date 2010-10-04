@@ -116,16 +116,16 @@ function openlayers_build_map($map = array()) {
   $map['styles'] = isset($map['styles']) ? 
     $map['styles'] : array();
 
-  $map['layer_styles'] = array();
+  $layer_styles = array();
   if ( isset($map['layer_styles']) ) {
     foreach ($map['layer_styles'] as $layer => $style) {
       // UPGRADE NOTE:
       // Presets up to 6.x-2.x-alpha10 always had a single style
       // per layer specified. Newer ones have them splitted by role
       if ( is_array($style) ) {
-        $map['layer_styles'][$layer] = $style;
+        $layer_styles[$layer] = $style;
       } else {
-        $map['layer_styles'][$layer] = array(
+        $layer_styles[$layer] = array(
           'default' => $style,
           'select' => $style,
           'temporary' => $style
@@ -133,6 +133,7 @@ function openlayers_build_map($map = array()) {
       }
     }
   }
+  $map['layer_styles'] = $layer_styles;
 
   $map['layers'] = _openlayers_layers_process($map['layers'], $map);
   $map['behaviors'] = _openlayers_behaviors_render($map['behaviors'], $map);
