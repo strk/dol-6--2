@@ -329,7 +329,7 @@ Drupal.openlayers = {
       // Grab and map base styles.
       for (var style_name in map.styles) {
         var style = map.styles[style_name]; // TODO: skip if undefined ?
-        stylesAdded[style] = this.buildStyle(map, style);
+        stylesAdded[style_name] = this.buildStyle(map, style);
       }
 
       // Implement layer-specific styles.
