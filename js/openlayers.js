@@ -284,16 +284,18 @@ Drupal.openlayers = {
   /**
    * Build an OpenLayers style from a drupal style object
    *
-   * @param map Drupal settings object for the map
-   * @param style Drupal settings object for the style 
+   * @param map Drupal settings object for the map (const)
+   * @param style_in Drupal settings object for the style (const)
    */
-  'buildStyle': function(map, style) {
+  'buildStyle': function(map, style_in) {
       // Build context object and callback values (if needed)
+      var style_out = {}
       var newContext = {}
-      for (var propname in style) {
-        if (typeof style[propname] == 'object') {
-          var plugin_name = style[propname]['plugin'];
-          var plugin_options = style[propname]['conf'];
+      for (var propname in style_in) {
+        if (typeof style_in[propname] == 'object') {
+          var plugin_spec = style_in[propname];
+          var plugin_name = plugin_spec['plugin'];
+          var plugin_options = plugin_spec['conf'];
           var plugin_class = Drupal.openlayers.style_plugin[plugin_name];
           // Check for existance of plugin_context_class here
           if ( typeof plugin_class === 'function' ) {
@@ -309,12 +311,14 @@ Drupal.openlayers = {
               }
             }
           }
-          style[propname] = '${' + newkey + '}';
+          style_out[propname] = '${' + newkey + '}';
+        } else {
+          style_out[propname] = style_in[propname];
         }
       }
 
-      // Put together style_name
-      var olStyle = new OpenLayers.Style(style, { context: newContext } );
+      // Instantiate an OL style object.
+      var olStyle = new OpenLayers.Style(style_out, { context: newContext } );
       return olStyle;
   },
   'getStyleMap': function(map, layername) {
@@ -324,14 +328,15 @@ Drupal.openlayers = {
 
       // Grab and map base styles.
       for (var style_name in map.styles) {
-        stylesAdded[style] = new OpenLayers.Style(map.styles[style_name]);
+        var style = map.styles[style_name]; // TODO: skip if undefined ?
+        stylesAdded[style] = this.buildStyle(map, style);
       }
 
       // Implement layer-specific styles.
       if (map.layer_styles !== undefined && map.layer_styles[layername]) {
 
         var style_name = map.layer_styles[layername]; 
-        var style = map.styles[style_name]; // TODO: skip if undefined
+        var style = map.styles[style_name]; // TODO: skip if undefined ?
 
         stylesAdded['default'] = stylesAdded['select'] = this.buildStyle(map, style);
 
