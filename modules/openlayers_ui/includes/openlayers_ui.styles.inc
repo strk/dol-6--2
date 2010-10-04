@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_ui.styles.inc,v 1.1.2.12 2010/09/07 20:15:26 strk Exp $
+// $Id: openlayers_ui.styles.inc,v 1.1.2.13 2010/10/03 12:47:39 tmcw Exp $
 
 /**
  * @file
@@ -138,8 +138,11 @@ function openlayers_ui_styles_get_properties() {
     ),
     'graphicName' => array(
       'default' => '',
-      'desc' => t('Name of a type of symbol to be used 
-        for a point mark.'),
+      'desc' => t('Name of a type of symbol to be used  for a point mark. 
+      You can use the names "star", "cross", "x", "square", "triangle", 
+      and "circle". See <a href="!url">Graphic Name Examples</a>.', array(
+          '!url' => 'http://openlayers.org/dev/examples/graphic-name.html',
+      )),
     ),
     'rotation' => array(
       'default' => '',
