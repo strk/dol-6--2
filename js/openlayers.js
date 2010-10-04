@@ -298,7 +298,8 @@ Drupal.openlayers = {
         for (var i=0; i<roles.length; ++i) {
           role = roles[i];
           if ( layer_styles[role] ) {
-            stylesAdded[role] = new OpenLayers.Style(layer_styles[role]);
+            var style = map.styles[layer_styles[role]]; // TODO: skip if undef
+            stylesAdded[role] = new OpenLayers.Style(style);
           }
         }
       }
