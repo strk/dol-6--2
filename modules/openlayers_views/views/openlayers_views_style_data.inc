@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_views_style_data.inc,v 1.1.2.28 2010/09/23 14:39:24 tmcw Exp $
+// $Id: openlayers_views_style_data.inc,v 1.1.2.29 2010/10/05 13:50:26 strk Exp $
 
 /**
  * @file
