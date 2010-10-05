@@ -117,14 +117,15 @@ function openlayers_build_map($map = array()) {
     $map['styles'] : array();
 
   $layer_styles = array();
-  if ( isset($map['layer_styles']) ) {
+  if (isset($map['layer_styles'])) {
     foreach ($map['layer_styles'] as $layer => $style) {
       // UPGRADE NOTE:
       // Presets up to 6.x-2.x-alpha10 always had a single style
-      // per layer specified. Newer ones have them splitted by role
+      // per layer specified. Newer ones have them split by role
       if ( is_array($style) ) {
         $layer_styles[$layer] = $style;
-      } else {
+      }
+      else {
         $layer_styles[$layer] = array(
           'default' => $style,
           'select' => $style,
