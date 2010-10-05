@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.42 2010/09/28 15:41:23 strk Exp $
+// $Id: openlayers.js,v 1.47.2.43 2010/10/05 13:55:37 strk Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -325,21 +325,25 @@ Drupal.openlayers = {
     if (map.styles) {
 
       var stylesAdded = {};
-
+      var roles = ['default', 'delete', 'select', 'temporary'];
       // Grab and map base styles.
-      for (var style_name in map.styles) {
-        var style = map.styles[style_name]; // TODO: skip if undefined ?
-        stylesAdded[style_name] = this.buildStyle(map, style);
+      for (var i=0; i<roles.length; ++i) {
+        role = roles[i];
+        if ( map.styles[role] ) {
+          var style = map.styles[role];
+          stylesAdded[role] = this.buildStyle(map, style);
+        }
       }
-
-      // Implement layer-specific styles.
+      // Override with layer-specific styles.
       if (map.layer_styles !== undefined && map.layer_styles[layername]) {
-
-        var style_name = map.layer_styles[layername]; 
-        var style = map.styles[style_name]; // TODO: skip if undefined ?
-
-        stylesAdded['default'] = stylesAdded['select'] = this.buildStyle(map, style);
-
+        var layer_styles = map.layer_styles[layername];
+        for (var i=0; i<roles.length; ++i) {
+          role = roles[i];
+          if ( layer_styles[role] ) {
+            var style = map.styles[layer_styles[role]]; // TODO: skip if undef
+            stylesAdded[role] = this.buildStyle(map, style);
+          }
+        }
       }
       
       return new OpenLayers.StyleMap(stylesAdded);

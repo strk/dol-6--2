@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.render.inc,v 1.3.2.19 2010/10/01 12:54:04 strk Exp $
+// $Id: openlayers.render.inc,v 1.3.2.20 2010/10/05 13:55:37 strk Exp $
 
 /**
  * @file
@@ -64,7 +64,8 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
  * @param $styles
  *   Array of map styles ( <style_role> : <style_name> | <style_array> )
  * @param $layer_styles
- *   Array of layer styles ( <layer_name> : <style_name> )
+ *   Array of layer styles ( <layer_name> : <style_name> | <by_role_array> )
+ *   The <by_role_array> is an array of <style_name> indexed by <style_role>
  * @param $map
  *   Map array
  * @return $processed
@@ -120,11 +121,18 @@ function _openlayers_styles_process($styles = array(),
   }
 
   // Add layer styles
-  foreach ($layer_styles as $style) {
-    if (!isset($processed[$style]) && 
-        !empty($styles_info[$style]) && 
-        $info = $styles_info[$style]->data) {
-      $processed[$style] = $info;
+  foreach ($layer_styles as $stylename) {
+    // UPGRADE NOTE:
+    // Presets up to 6.x-2.x-alpha10 always had a single style
+    // per layer specified. Newer ones have them splitted by role
+    $stylenames = is_array($stylename) ? array_values($stylename)
+      : array($stylename);
+    foreach ($stylenames as $style) {
+      if (!isset($processed[$style]) && 
+          !empty($styles_info[$style]) && 
+          $info = $styles_info[$style]->data) {
+        $processed[$style] = $info;
+      }
     }
   }
 

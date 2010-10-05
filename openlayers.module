@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.module,v 1.69.2.82 2010/09/09 20:28:07 strk Exp $
+// $Id: openlayers.module,v 1.69.2.83 2010/10/05 13:55:37 strk Exp $
 
 /**
  * @defgroup openlayers OpenLayers provides an API and
@@ -115,8 +115,25 @@ function openlayers_build_map($map = array()) {
   // styles and layer styles are not required parameters
   $map['styles'] = isset($map['styles']) ? 
     $map['styles'] : array();
-  $map['layer_styles'] = isset($map['layer_styles']) ? 
-    $map['layer_styles'] : array();
+
+  $layer_styles = array();
+  if ( isset($map['layer_styles']) ) {
+    foreach ($map['layer_styles'] as $layer => $style) {
+      // UPGRADE NOTE:
+      // Presets up to 6.x-2.x-alpha10 always had a single style
+      // per layer specified. Newer ones have them splitted by role
+      if ( is_array($style) ) {
+        $layer_styles[$layer] = $style;
+      } else {
+        $layer_styles[$layer] = array(
+          'default' => $style,
+          'select' => $style,
+          'temporary' => $style
+        );
+      }
+    }
+  }
+  $map['layer_styles'] = $layer_styles;
 
   $map['layers'] = _openlayers_layers_process($map['layers'], $map);
   $map['behaviors'] = _openlayers_behaviors_render($map['behaviors'], $map);
