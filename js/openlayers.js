@@ -340,12 +340,13 @@ Drupal.openlayers = {
         for (var i=0; i<roles.length; ++i) {
           role = roles[i];
           if ( layer_styles[role] ) {
-            var style = map.styles[layer_styles[role]]; // TODO: skip if undef
+            var style_name = layer_styles[role];
+            var style = map.styles[style_name]; // TODO: skip if undef
             stylesAdded[role] = this.buildStyle(map, style);
           }
         }
       }
-      
+
       return new OpenLayers.StyleMap(stylesAdded);
     }
     // Default styles
