@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_ui.presets.inc,v 1.1.2.30 2010/09/14 07:13:40 strk Exp $
+// $Id: openlayers_ui.presets.inc,v 1.1.2.31 2010/10/05 13:55:37 strk Exp $
 
 /**
  * @file

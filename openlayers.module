@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.module,v 1.69.2.82 2010/09/09 20:28:07 strk Exp $
+// $Id: openlayers.module,v 1.69.2.83 2010/10/05 13:55:37 strk Exp $
 
 /**
  * @defgroup openlayers OpenLayers provides an API and
