@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.module,v 1.69.2.83 2010/10/05 13:55:37 strk Exp $
+// $Id: openlayers.module,v 1.69.2.84 2010/10/06 09:08:44 strk Exp $
 
 /**
  * @defgroup openlayers OpenLayers provides an API and
@@ -124,7 +124,8 @@ function openlayers_build_map($map = array()) {
       // per layer specified. Newer ones have them splitted by role
       if ( is_array($style) ) {
         $layer_styles[$layer] = $style;
-      } else {
+      }
+      else {
         $layer_styles[$layer] = array(
           'default' => $style,
           'select' => $style,
