@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_ui.styles.inc,v 1.1.2.14 2010/10/06 09:08:44 strk Exp $
+// $Id: openlayers_ui.styles.inc,v 1.1.2.15 2010/10/07 13:24:15 tmcw Exp $
 
 /**
  * @file
@@ -163,7 +163,7 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
     'label' => array(
       'default' => '',
       'desc' => t('A label to show for features. '
-        . 'Tipically used with ${attribute} syntax.'),
+        . 'Typically used with ${attribute} syntax.'),
     ),
     'labelAlign' => array(
       'default' => 'cm',

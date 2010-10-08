@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.43 2010/10/05 13:55:37 strk Exp $
+// $Id: openlayers.js,v 1.47.2.44 2010/10/08 09:52:00 strk Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -55,6 +55,7 @@ Drupal.behaviors.openlayers = function(context) {
           if (map.projection === '900913') {
             options.maxExtent = new OpenLayers.Bounds(
               -20037508.34, -20037508.34, 20037508.34, 20037508.34);
+             options.units = "m";
           }
           if (map.projection === '4326') {
             options.maxExtent = new OpenLayers.Bounds(-180, -90, 180, 90);
