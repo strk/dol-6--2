@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_ui.styles.inc,v 1.1.2.15 2010/10/07 13:24:15 tmcw Exp $
+// $Id: openlayers_ui.styles.inc,v 1.1.2.16 2010/10/13 09:03:58 strk Exp $
 
 /**
  * @file
@@ -12,9 +12,7 @@
 /**
  * Styles add/edit form.
  */
-function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
-  $form = array();
-  
+function openlayers_ui_styles_get_properties() {
   // Available styling properies.  Defaults and descriptions are taken
   // from OpenLayers.
   // @see http://docs.openlayers.org/library/feature_styling.html
@@ -205,17 +203,36 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
       'desc' => t('Label font weight.'),
     ),
   );
+
+  return $properties;
+}
+
+/**
+ * Styles add/edit form.
+ */
+function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
+  $form = array();
   
+  $properties = openlayers_ui_styles_get_properties();
+  
+  $style_data = !empty($style->data) ? $style->data : array();
+
   // Pass style data along
   $form['style_data'] = array(
     '#type' => 'value',
-    '#value' => $properties,
+    '#value' => array(
+      'definitions' => $properties,
+      'defaults' => $style_data
+    )
   );
 
   // Style object basics
   $form['info'] = array(
     '#type' => 'fieldset',
     '#tree' => FALSE,
+    '#title' => t('Basic Information'),
+    '#description' => t('The basic information for the style, used to refer to and describe the style.'),
+    '#collapsible' => TRUE,
   );
   $form['info']['name'] = array(
     '#title' => t('Name'),
@@ -236,21 +253,91 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
   );
 
   // OpenLayers style properties
-  $form['data'] = array('#type' => 'fieldset', '#tree' => TRUE);
-
+  $form['data'] = array(
+    '#type' => 'fieldset', 
+    '#tree' => TRUE,
+    '#title' => t('Style Properties and Plugins'),
+    '#description' => t('Style properties are properties as 
+      defined by the OpenLayers library.  Plugins are dynamically
+      process the layer at render time; plugins may override the
+      values that you have set for style properies.'),
+    '#collapsible' => TRUE,
+  );
   foreach ($properties as $key => $prop) {
+
     $form['data'][$key] = array(
-      '#type' => !isset($prop['options']) ? 'textfield' : 'select',
+      '#type' => 'fieldset',
+      '#tree' => TRUE,
       '#title' => $key,
       '#description' => $prop['desc'],
-      '#default_value' => isset($style->data[$key]) ?
-        $style->data[$key] : $prop['default'],
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
     );
-    
-    // Add options if needed
-    if (isset($prop['options']) && is_array($prop['options'])) {
-      $form['data'][$key]['#options'] = $prop['options'];
+
+    $def_value = $prop['default'];
+    $def_use_plugin = '';
+
+    if ( isset($style_data[$key]) ) {
+      if ( is_array($style_data[$key]) ) {
+        $def_use_plugin = $style_data[$key]['plugin'];
+      }
+      else {
+        $def_value = $style_data[$key];
+      }
     }
+
+    // Add plugin options, if any
+    $handling_plugins = openlayers_ui_get_style_plugins_for_property($key);
+
+    if ( ! empty($handling_plugins) ) {
+      $plugin_options = array('' => t('none'));
+      foreach ($handling_plugins as $plugname => $plug) {
+        $plugin_options[$plugname] = $plug['title'];
+      }
+
+      $form['data'][$key]['uses_plugin'] = array(
+        '#title' => t('Use plugin'),
+        '#type' => 'select',
+        '#options' => $plugin_options,
+        '#default_value' => $def_use_plugin,
+        '#ahah' => array(
+          'path' => 'openlayers/ahah/style_plugin/' . $key,
+          'wrapper' => $key . '-style-plugin',
+          'method' => 'replace',
+          'effect' => 'fade', // 'fade', 'none', 'slide'
+        )
+      );
+    }
+
+    // Hackish... but is that new for HTML ? ...
+    $form['data'][$key]['plugin_conf_start'] = array(
+      '#value' => '<div id="' . $key . '-style-plugin">'
+    );
+
+    if ( isset($style_data[$key]) && is_array($style_data[$key]) ) {
+      $defaults = $style_data[$key]['conf'];
+      $plugname = $style_data[$key]['plugin'];
+      $form['data'][$key]['plugin'] =
+        openlayers_ui_get_style_plugin_form($def_use_plugin, $defaults);
+    }
+    else {
+      $form['data'][$key]['value'] = array(
+        '#type' => !isset($prop['options']) ? 'textfield' : 'select',
+        '#default_value' => $def_value
+      );
+      
+      // Add options if needed
+      if (isset($prop['options']) && is_array($prop['options'])) {
+        $form['data'][$key]['value']['#options'] = $prop['options'];
+      }
+    }
+
+
+    // Hackish... but is that new for HTML ? ...
+    $form['data'][$key]['plugin_conf_end'] = array(
+      '#value' => '</div>'
+    );
+
   }
 
   $form['submit'] = array(
@@ -264,32 +351,49 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
  * Submit handler for layers.
  */
 function openlayers_ui_styles_form_submit(&$form, &$form_state) {
-  $style_data = $form_state['values']['style_data'];
+
+  $prop_defn = $form_state['values']['style_data']['definitions'];
   
+  //$data = $form_state['values']['data'];
+  $data = $form_state['clicked_button']['#post']['data'];
+
   // Cast and unset values so JS can handle them better,
-  // Unless vluase is in form ${attribute}
-  foreach ($form_state['values']['data'] as $key => $value) {
-    if ($form_state['values']['data'][$key] === '') {
-      unset($form_state['values']['data'][$key]);
+  // Unless value is in form ${attribute}
+  foreach ($data as $key => $value) {
+    if ( empty($data[$key]['uses_plugin']) ) {
+      $data[$key] = $data[$key]['value'];
+      if ($data[$key] === '') {
+        unset($data[$key]);
+      }
+      elseif (isset($prop_defn[$key]['type']) &&
+          strpos($data[$key], '${') !== 0) {
+        if ($prop_defn[$key]['type'] == 'integer') {
+          $data[$key] = (int) $data[$key];
+        }
+        elseif ($prop_defn[$key]['type'] == 'float') {
+          $data[$key] = (float) $data[$key];
+        }
+      }
     }
-    elseif (isset($style_data[$key]['type']) &&
-      strpos($form_state['values']['data'][$key], '${') !== 0) {
-      if ($style_data[$key]['type'] == 'integer') {
-        $form_state['values']['data'][$key] = 
-          (int) $form_state['values']['data'][$key];
+    else {
+      $spec = array(
+        'plugin' => $data[$key]['uses_plugin'],
+      );
+      if ( isset($data[$key]['plugin']['conf']) ) {
+        $spec['conf'] = $data[$key]['plugin']['conf'];
       }
-      elseif ($style_data[$key]['type'] == 'float') {
-        $form_state['values']['data'][$key] = 
-          (float) $form_state['values']['data'][$key];
-      }
+      $data[$key] = $spec;
     }
   }
-  
+
+  $form_state['values']['data'] = $data;
+  $form_state['clicked_button']['#post']['data'] = $data;
+
   $style = new stdClass();
   $style->name = $form_state['values']['name'];
   $style->title = $form_state['values']['title'];
   $style->description = $form_state['values']['description'];
-  $style->data = $form_state['values']['data'];
+  $style->data = $data;
 
   $success = openlayers_style_save($style);
   
@@ -302,4 +406,124 @@ function openlayers_ui_styles_form_submit(&$form, &$form_state) {
   else {
     form_set_error('openlayers', t('Error trying to save style.'));
   }
+}
+
+/**
+ * Get a list of style plugins providing handling of a given property
+ *
+ * @param $propname Name of the property we're interested in
+ *
+ */
+function openlayers_ui_get_style_plugins_for_property($propname) {
+  $handling = array();
+  $available = openlayers_style_plugins();
+  foreach ($available as $plugname => $plugin) {
+    $plugin_class = ctools_plugin_get_class($plugin, 'style_plugin');
+    if (empty($plugin_class)) continue; // should we watchdog here ?
+    $plugin_instance = new $plugin_class;
+    if ( $plugin_instance->can_handle_property($propname) ) {
+      $handling[$plugname] = $plugin;
+    }
+  }
+  return $handling;
+}
+
+/**
+ * Get options of a style plugin by plugin name
+ */
+function openlayers_ui_get_style_plugin_form($plugname, $defaults) {
+
+  $form = array();
+
+  $available = openlayers_style_plugins();
+  if ( ! $available[$plugname] ) {
+    watchdog('openlayers_ui', 'Style plugin !name unknown',
+      array('!name' => $plugname), WATCHDOG_ERROR);
+    return $form;
+  }
+
+  $plugin = $available[$plugname];
+  $plugin_class = ctools_plugin_get_class($plugin, 'style_plugin');
+  if (empty($plugin_class)) {
+    watchdog('openlayers_ui', 'Style plugin !name does not have a class?!',
+      array('!name' => $plugname), WATCHDOG_ERROR);
+    return $form; 
+  }
+
+  // Create object and ask it for options
+  $style_plugin = new $plugin_class;
+
+  $form = array(
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    //'#title' => $plugin['title'],
+    '#description' => $plugin['description'],
+    'conf' => $style_plugin->options_form($defaults)
+  );
+
+  return $form;
+}
+
+function openlayers_ui_style_plugin_ahah($propname) {
+
+  $posted = $_POST["data"][$propname];
+  $plugname = $posted['uses_plugin'];
+
+  // Get cached form 
+  $form_state = array('storage' => NULL, 'submitted' => FALSE);
+  $form_build_id = $_POST['form_build_id'];
+  $form_cached = form_get_cache($form_build_id, $form_state);
+
+  // Get style_data from cached form, and defaults
+  $style_data = $form_cached['style_data']['#value'];
+  $defaults = $style_data['defaults'];
+
+
+
+  if ( ! $plugname ) {
+
+    // Find default value
+    $properties = $style_data['definitions'];
+    $prop = $properties[$propname];
+    $def_value = $prop['default'];
+    if ( isset($defaults[$propname]) && ! is_array($defaults[$propname]) ) {
+      $def_value = $defaults[$propname];
+    }
+
+    $form = array(
+      '#type' => !isset($prop['options']) ? 'textfield' : 'select',
+      '#default_value' => $def_value
+    );
+      
+    // Add options if needed
+    if (isset($prop['options']) && is_array($prop['options'])) {
+      $form['value']['#options'] = $prop['options'];
+    }
+
+    $form['#parents'] = array('data', $propname, 'value');
+
+  }
+  else {
+
+    // Find default value
+    $defs = array();
+    if ( isset($defaults[$propname]) && is_array($defaults[$propname])
+      && $defaults[$propname]['plugin'] == $plugname ) {
+      $defs = $defaults[$propname]['conf'];
+    }
+
+    $form = openlayers_ui_get_style_plugin_form($plugname, $defs);
+    $form['#parents'] = array('data', $propname, 'plugin');
+
+  }
+
+
+  $form_state = array(); // TODO: what to do with this ?
+  $plugform_built = form_builder('style_plugin_form', $form, $form_state);
+
+  $output = drupal_render($plugform_built);
+
+  // Final rendering callback.
+  drupal_json(array('status' => TRUE, 'data' => $output));
+
 }

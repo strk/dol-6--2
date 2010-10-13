@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.44 2010/10/08 09:52:00 strk Exp $
+// $Id: openlayers.js,v 1.47.2.45 2010/10/13 09:03:58 strk Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -282,15 +282,66 @@ Drupal.openlayers = {
       layer.addFeatures(newFeatures);
     }
   },
+  /**
+   * Build an OpenLayers style from a drupal style object
+   *
+   * @param map Drupal settings object for the map (const)
+   * @param style_in Drupal settings object for the style (const)
+   */
+  'buildStyle': function(map, style_in) {
+      // Build context object and callback values (if needed)
+      var style_out = {};
+      var newContext = {};
+      for (var propname in style_in) {
+        if (typeof style_in[propname] == 'object') {
+          var plugin_spec = style_in[propname];
+          var plugin_name = plugin_spec['plugin'];
+          var plugin_class = Drupal.openlayers.style_plugin[plugin_name];
+          if ( typeof plugin_class !== 'function' ) {
+            throw "Style plugin " + plugin_name + " did not install a constructor in Drupal.openlayers.style_plugin['" + plugin_name + "']";
+          }
+
+          var plugin_options = plugin_spec['conf'];
+          var plugin_method_name = plugin_spec['method'];
+          if ( typeof plugin_method_name === 'undefined' ) {
+            throw "Name of method handler for property '" + propname +
+              "' of style plugin '" + plugin_name + "' is undefined";
+          }
+
+          var plugin_context = new plugin_class(plugin_options);
+
+          var plugin_method = plugin_context[plugin_method_name];
+          if ( typeof plugin_method !== 'function' ) {
+            throw "Style plugin '" + plugin_name + "' advertised method '" + plugin_method_name + "' as an handler for property " + propname + " but that method is not found in instance of plugin class";
+          }
+
+          var new_method_name = plugin_name + '_' +
+                                propname + '_' +
+                                plugin_method_name;
+          newContext[new_method_name] =
+            OpenLayers.Function.bind(plugin_method, plugin_context); 
+
+          style_out[propname] = '${' + new_method_name + '}';
+        } else {
+          style_out[propname] = style_in[propname];
+        }
+      }
+
+      // Instantiate an OL style object.
+      var olStyle = new OpenLayers.Style(style_out, { context: newContext } );
+      return olStyle;
+  },
   'getStyleMap': function(map, layername) {
     if (map.styles) {
+
       var stylesAdded = {};
       var roles = ['default', 'delete', 'select', 'temporary'];
       // Grab and map base styles.
       for (var i=0; i<roles.length; ++i) {
         role = roles[i];
         if ( map.styles[role] ) {
-          stylesAdded[role] = new OpenLayers.Style(map.styles[role]);
+          var style = map.styles[role];
+          stylesAdded[role] = this.buildStyle(map, style);
         }
       }
       // Override with layer-specific styles.
@@ -299,11 +350,13 @@ Drupal.openlayers = {
         for (var i=0; i<roles.length; ++i) {
           role = roles[i];
           if ( layer_styles[role] ) {
-            var style = map.styles[layer_styles[role]]; // TODO: skip if undef
-            stylesAdded[role] = new OpenLayers.Style(style);
+            var style_name = layer_styles[role];
+            var style = map.styles[style_name]; // TODO: skip if undef
+            stylesAdded[role] = this.buildStyle(map, style);
           }
         }
       }
+
       return new OpenLayers.StyleMap(stylesAdded);
     }
     // Default styles
@@ -334,3 +387,4 @@ Drupal.openlayers = {
 };
 
 Drupal.openlayers.layer = {};
+Drupal.openlayers.style_plugin = {};

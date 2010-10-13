@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.render.inc,v 1.3.2.20 2010/10/05 13:55:37 strk Exp $
+// $Id: openlayers.render.inc,v 1.3.2.21 2010/10/13 09:03:58 strk Exp $
 
 /**
  * @file
@@ -73,9 +73,66 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
  */
 function _openlayers_styles_process($styles = array(), 
   $layer_styles = array(), &$map = array()) {
+  ctools_include('plugins');
 
   // Get styles info array
   $styles_info = openlayers_styles();
+
+  // Process style property plugins, if any
+  $used_plugins = array();
+  foreach ($styles_info as $i => $style) {
+    // Check for property plugins.
+    foreach ($style->data as $prop => $propval) {
+      if ( is_array($propval) ) {
+
+        $plugname = $propval['plugin'];
+
+        // This should never happen, except
+        // for cases in which the old style plugin 
+        // system was used (for prop == 'plugins')
+        if ( empty($plugname) ) continue;
+
+        if ( ! isset($used_plugins[$plugname]) ) {
+          // Lazily fetch list of style plugins
+          if ( ! isset($style_plugins) ) {
+            $style_plugins = openlayers_style_plugins();
+          }
+          // Instanciate plugin class
+          $ctplug = $style_plugins[$plugname];
+          $plugin_class = ctools_plugin_get_class($ctplug, 'style_plugin');
+          if ( isset($plugin_class)) {
+            $plugin =  new $plugin_class;
+            $used_plugins[$plugname] = array(
+              'plugin' => $plugin,
+              'methods' => $plugin->get_context_properties()
+            );
+          }
+        } 
+
+        if ( isset($used_plugins[$plugname]) ) {
+          $method_name = $used_plugins[$plugname]['methods'][$prop];
+          $style->data[$prop]['method'] = $method_name;
+        }
+        else {
+          watchdog('openlayers',
+            'Could not find plugin "!plugname", '.
+            'referenced by property "!prop" of style "!style"',
+            array('!plugname' => $plugname, '!prop' => $prop, '!style' => $i),
+            WATCHDOG_WARNING); 
+          unset($style->data[$prop]); 
+        }
+
+      }
+    }
+  }
+
+  if ( ! empty($used_plugins) ) {
+    foreach ($used_plugins as $plugname => $plugin_info) {
+      $plugin = $plugin_info['plugin'];
+      $plugin->render();
+    }
+  }
+
 
   // Go through styles
   $processed = array();
