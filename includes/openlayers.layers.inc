@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.layers.inc,v 1.9.2.24 2010/08/06 13:59:09 tmcw Exp $
+// $Id: openlayers.layers.inc,v 1.9.2.25 2010/10/13 18:49:16 tmcw Exp $
 
 /**
  * @file
@@ -156,7 +156,7 @@ function _openlayers_openlayers_layers() {
     ),
     'projection' => array('900913'),
     'layer_type' => 'openlayers_layer_type_xyz',
-    'url' => 'http://tile.openstreetmap.org/${z}/${x}/${y}.png',
+    'base_url' => 'http://tile.openstreetmap.org/${z}/${x}/${y}.png',
   );
   $layers[$layer->name] = $layer;
 
@@ -177,7 +177,7 @@ function _openlayers_openlayers_layers() {
     ),
     'projection' => array('900913'),
     'layer_type' => 'openlayers_layer_type_xyz',
-    'url' => 'http://tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png',
+    'base_url' => 'http://tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png',
   );
   $layers[$layer->name] = $layer;
 
@@ -198,7 +198,7 @@ function _openlayers_openlayers_layers() {
     ),
     'projection' => array('900913'),
     'layer_type' => 'openlayers_layer_type_xyz',
-    'url' => 'http://andy.sandbox.cloudmade.com/tiles/cycle/${z}/${x}/${y}.png',
+    'base_url' => 'http://andy.sandbox.cloudmade.com/tiles/cycle/${z}/${x}/${y}.png',
   );
   $layers[$layer->name] = $layer;
 
