@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers.layers.inc,v 1.9.2.25 2010/10/13 18:49:16 tmcw Exp $
+// $Id: openlayers.layers.inc,v 1.9.2.26 2010/10/22 09:31:50 strk Exp $
 
 /**
  * @file
@@ -220,7 +220,7 @@ function _openlayers_openlayers_layers() {
     ),
     'projection' => array('4326'),
     'layer_type' => 'openlayers_layer_type_wms',
-    'url' => 'http://oam.hypercube.telascience.org/tiles',
+    'base_url' => 'http://oam.hypercube.telascience.org/tiles',
     'params' => array(
       'isBaseLayer' => FALSE,
       'layers' => 'osm-4326-hybrid',
