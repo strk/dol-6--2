@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_views_style_data.inc,v 1.1.2.29 2010/10/05 13:50:26 strk Exp $
+// $Id: openlayers_views_style_data.inc,v 1.1.2.30 2010/10/14 10:10:11 zzolo Exp $
 
 /**
  * @file
@@ -397,7 +397,7 @@ class openlayers_views_style_data extends views_plugin_style {
           $name_field = $fields[$data_source['name_field']]['field_alias'];
           $feature['attributes']['name'] = $rendered_record[$name_field];
           $excluded_fields[] = $name_field;
-          if ( $data_source['keep_orig_name_field'] ) {
+          if (!empty($data_source['keep_orig_name_field'])) {
             $feature['attributes'][$data_source['name_field']] = $record->$name_field;
           }
         }
@@ -408,7 +408,7 @@ class openlayers_views_style_data extends views_plugin_style {
           $description_field = $fields[$data_source['description_field']]['field_alias'];
           $feature['attributes']['description'] = $rendered_record[$description_field];
           $excluded_fields[] = $description_field;
-          if ( $data_source['keep_orig_desc_field'] ) {
+          if (!empty($data_source['keep_orig_desc_field'])) {
             $feature['attributes'][$data_source['description_field']] = $record->$description_field;
           }
         }
