@@ -1,4 +1,4 @@
-// $Id: openlayers_behavior_drawfeatures.js,v 1.1.2.16 2010/09/27 21:45:44 tmcw Exp $
+// $Id: openlayers_behavior_drawfeatures.js,v 1.1.2.17 2010/10/28 08:49:20 strk Exp $
 
 /**
  * @file
@@ -19,14 +19,20 @@ Drupal.behaviors.openlayers_behavior_drawfeatures = function(context) {
       features.feature.layer.removeFeatures(features.object.features.shift());
     }
 
-    var features_copy = features.object.clone();
-    for(var i in features_copy.features) {
-      features_copy.features[i].geometry.transform(
-        features.object.map.projection,
-        new OpenLayers.Projection("EPSG:4326")
-      );
+    var features_copy = [];
+    for(var i in features.object.features) {
+      // Features marked as '_sketch' should not be persisted.
+      if (!features.object.features[i]._sketch) {
+        var feature_copy = features.object.features[i].clone();
+        feature_copy.geometry.transform(
+          features.object.map.projection,
+          new OpenLayers.Projection("EPSG:4326")
+        );
+        features_copy.push(feature_copy);
+      }
     }
-    this.element.val(WktWriter.write(features_copy.features));
+
+    this.element.val(WktWriter.write(features_copy));
   }
 
   var data = $(context).data('openlayers');
@@ -115,16 +121,6 @@ Drupal.behaviors.openlayers_behavior_drawfeatures = function(context) {
 
     control.activateControl(control.getControlsByClass('OpenLayers.Control.Navigation')[0]);
     control.redraw();
-
-    this.element.parents('form').bind('submit', 
-      {
-        control: control, 
-        dataLayer: dataLayer 
-      }, function(evt) {
-        $.map(evt.data.control.controls, function(c) { c.deactivate(); });
-        dataLayer.events.triggerEvent('featuremodified');
-      }
-    );
 
     // Add modify feature tool
     control.addControls(new OpenLayers.Control.ModifyFeature(
