@@ -1,4 +1,4 @@
-// $Id: openlayers.js,v 1.47.2.47 2010/10/28 07:12:35 strk Exp $
+// $Id: openlayers.js,v 1.47.2.49 2010/10/28 07:24:14 strk Exp $
 /*jslint white: false */
 /*jslint forin: true */
 /*global OpenLayers Drupal $ document jQuery window */
@@ -260,10 +260,11 @@ Drupal.openlayers = {
             // "pseudofeatures".
             //
             // In order to identify the real feature each geometry belongs to
-            // we then add a 'fid' parameter to the "pseudofeature".
+            // we then add a 'drupalFID' parameter to the "pseudofeature".
             // NOTE: 'drupalFID' is only unique within a single layer.
             newFeature.attributes = feature.attributes;
-            newFeature.data = feature.attributes;
+            // See http://drupal.org/node/949434 before wiping out
+            //newFeature.data = feature.attributes;
             newFeature.drupalFID = key;
           }
 
