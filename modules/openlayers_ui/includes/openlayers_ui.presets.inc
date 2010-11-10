@@ -297,6 +297,8 @@ function openlayers_ui_presets_form(&$form_state, $preset = NULL, $edit = FALSE)
   // Overlay layers
   $overlay_options = openlayers_ui_get_layer_options('overlay', $defaults['projection']);
   $form['layerstyles']['layers']['overlaylabels'] = array();
+  $form['layerstyles']['layer_styles'] = array();
+  $form['layerstyles']['layer_weight'] = array();
   if (!empty($overlay_options)) {
 
     // Have enabled layers maintain their order
