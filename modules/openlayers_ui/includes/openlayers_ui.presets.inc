@@ -297,8 +297,6 @@ function openlayers_ui_presets_form(&$form_state, $preset = NULL, $edit = FALSE)
   // Overlay layers
   $overlay_options = openlayers_ui_get_layer_options('overlay', $defaults['projection']);
   $form['layerstyles']['layers']['overlaylabels'] = array();
-  $form['layerstyles']['layer_styles'] = array();
-  $form['layerstyles']['layer_weight'] = array();
   if (!empty($overlay_options)) {
 
     // Have enabled layers maintain their order
@@ -614,10 +612,12 @@ function openlayers_ui_presets_form_process($values = array()) {
         // Sort overlay layers by weight, in case browser didn't
         // send them already sorted
         $overlays = array();
-        asort($values['layer_weight']);
-        foreach (array_keys($values['layer_weight']) as $key) {
-          if ( $values['layers']['overlays'][$key] ) {
-             $overlays[$key] = $key;
+        if ( ! empty($values['layers']['overlays']) ) {
+          asort($values['layer_weight']);
+          foreach (array_keys($values['layer_weight']) as $key) {
+            if ( $values['layers']['overlays'][$key] ) {
+               $overlays[$key] = $key;
+            }
           }
         }
 
@@ -628,10 +628,12 @@ function openlayers_ui_presets_form_process($values = array()) {
 
       case 'layer_styles':
         $processed['layer_styles'] = array();
-        foreach ($values['layer_styles'] as $layer => $stylespec) {
-          $layerarray = array_filter($stylespec);
-          if ( ! empty($layerarray) ) {
-            $processed['layer_styles'][$layer] = $layerarray;
+        if ( ! empty($values['layer_styles']) ) {
+          foreach ($values['layer_styles'] as $layer => $stylespec) {
+            $layerarray = array_filter($stylespec);
+            if ( ! empty($layerarray) ) {
+              $processed['layer_styles'][$layer] = $layerarray;
+            }
           }
         }
         break;
