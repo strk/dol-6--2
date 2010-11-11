@@ -1,5 +1,5 @@
 <?php
-// $Id: openlayers_ui.presets.inc,v 1.1.2.31 2010/10/05 13:55:37 strk Exp $
+// $Id: openlayers_ui.presets.inc,v 1.1.2.32 2010/11/11 08:23:48 strk Exp $
 
 /**
  * @file
@@ -612,10 +612,12 @@ function openlayers_ui_presets_form_process($values = array()) {
         // Sort overlay layers by weight, in case browser didn't
         // send them already sorted
         $overlays = array();
-        asort($values['layer_weight']);
-        foreach (array_keys($values['layer_weight']) as $key) {
-          if ( $values['layers']['overlays'][$key] ) {
-             $overlays[$key] = $key;
+        if ( ! empty($values['layers']['overlays']) ) {
+          asort($values['layer_weight']);
+          foreach (array_keys($values['layer_weight']) as $key) {
+            if ( $values['layers']['overlays'][$key] ) {
+               $overlays[$key] = $key;
+            }
           }
         }
 
@@ -626,10 +628,12 @@ function openlayers_ui_presets_form_process($values = array()) {
 
       case 'layer_styles':
         $processed['layer_styles'] = array();
-        foreach ($values['layer_styles'] as $layer => $stylespec) {
-          $layerarray = array_filter($stylespec);
-          if ( ! empty($layerarray) ) {
-            $processed['layer_styles'][$layer] = $layerarray;
+        if ( ! empty($values['layer_styles']) ) {
+          foreach ($values['layer_styles'] as $layer => $stylespec) {
+            $layerarray = array_filter($stylespec);
+            if ( ! empty($layerarray) ) {
+              $processed['layer_styles'][$layer] = $layerarray;
+            }
           }
         }
         break;
