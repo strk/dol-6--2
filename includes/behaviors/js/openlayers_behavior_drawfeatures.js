@@ -1,4 +1,4 @@
-// $Id: openlayers_behavior_drawfeatures.js,v 1.1.2.17 2010/10/28 08:49:20 strk Exp $
+// $Id: openlayers_behavior_drawfeatures.js,v 1.1.2.18 2010/11/13 13:43:42 zzolo Exp $
 
 /**
  * @file
@@ -60,25 +60,27 @@ Drupal.behaviors.openlayers_behavior_drawfeatures = function(context) {
       var wktFormat = new OpenLayers.Format.WKT();
       var features = wktFormat.read(this.element.text());
 
-      if (features.constructor == Array) {
-        if (features.length == 1 && features[0] == undefined) {
-          features = [];
+      if (typeof features != 'undefined') {
+        if (features.constructor == Array) {
+          if (features.length == 1 && features[0] == undefined) {
+            features = [];
+          }
+          for (var i in features) {
+            features[i].geometry = features[i].geometry.transform(
+              new OpenLayers.Projection('EPSG:4326'),
+              data.openlayers.projection
+            );
+          }
         }
-        for (var i in features) {
-          features[i].geometry = features[i].geometry.transform(
+        else if (features.geometry) {
+          features.geometry = features.geometry.transform(
             new OpenLayers.Projection('EPSG:4326'),
             data.openlayers.projection
           );
+          features = [features];
         }
+        dataLayer.addFeatures(features);
       }
-      else {
-        features.geometry = features.geometry.transform(
-          new OpenLayers.Projection('EPSG:4326'),
-          data.openlayers.projection
-        );
-        features = [features];
-      }
-      dataLayer.addFeatures(features);
     }
 
     // registering events late, because adding data
